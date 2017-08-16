@@ -1,0 +1,55 @@
+#Multiparameter models
+#Normal Data with both parameters (mu, sigma2) unknown (pp. 63-65)
+
+library(LearnBayes)
+
+#construct a contour plot of the joint posterior density
+#use data marathontimes, variable time
+#Normchi2post (in LearnBayes) computes the 
+#logarithm of the joint posterior density of (mu, sigma^2)
+
+data(marathontimes)
+attach(marathontimes)
+
+#mycontour (in LearnBayes) is used to make the contour plot
+#mycontour arguments - 1. function that defines the log density; 
+#2. a vector of values that define the rectangle (xlo, xhi, ylo, ylo, yhi)
+#3. data in in the function for log density; 4. any optional parameters
+
+d=mycontour(normchi2post, c(220, 330, 500, 9000), time, 
+xlab="mean", ylab="variance")
+
+#summarize this posterior distribution by simulation.
+#simulate sigma^2 from "scale times inverse chi-square (p.64)
+
+S=sum((time-mean(time))^2)
+n=length(time)
+
+#transform draws from chi-square to obtain "scale time inverse chi-square"
+
+sigma2=S/rchisq(1000, n-1)
+
+#simulate mu from normal(y(bar), sigma/n^.5)(p.64)
+
+mu=rnorm(1000, mean=mean(time), sd=sqrt(sigma2)/sqrt(n))
+
+#display the simulated sampled values of mu and sigma^2 
+#on top of the contour plot of the distributions
+
+points(mu, sigma2)
+
+#normpostsim in LEarnBayes implements this simulation algorithm
+#I tried this on my own - not in ALbert. Needs to be checked.
+#argument prior needs to be checked.
+
+t=normpostsim(time, prior=NULL, m=1000)
+points(t$mu, t$sigma2)
+
+#inference
+#Constrcut a 95% interval estimate for the mean
+
+quantile(mu, c(.025, 0.975))
+
+#construct 95% probability interval for sigma
+
+quantile(sqrt(sigma2), c(.025, .975))

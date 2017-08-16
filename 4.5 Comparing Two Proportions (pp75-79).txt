@@ -1,0 +1,55 @@
+#4.5 Comparing Two Proportions
+#This makes use of Howard's (1998) dependent prior function howardprior
+#See p.76
+
+library("LearnBayes")
+#The dependent prior has 5 parameters! - alpha, beta, gamma, delta, and sigma
+#The first four parameters reflect one's prior belief about the locations of p1 and p2
+#the first two are success and failure counts for sample 1 and 
+#the last two are success and failure counts for sample 2.
+#sigma indicates ptior belief in the dependence between two proportions
+
+#suppose prior location parameter is believed to be 1.
+#that is alpha=beta=gamma=delta=1.
+sigma=c(2,1,.5,.25)
+plo=.0001;phi=.9999
+par(mfrow=c(2,2))
+for (i in 1:4)
+	mycontour(howardprior, c(plo, phi, plo, phi), c(1,1,1,1,sigma[i]),
+		main=paste("sigma=", as.character(sigma[i])),
+		xlab="p1", ylab="p2")
+
+#suppose we observe counts y1 and y2 from two binomial samples.
+#see Likelihood function in p. 77
+#combining the prior with the likelihood we obtain a 
+#posterior density with the same functional "dependent" form BUT with updated parameters
+
+#(alpha+y1, beta+n1-y1, gamma+y2, delta+n2-y2, and sigma)
+#since the posterior is of the same functional form as the prioir,
+#we can still use howardprior function
+#we use data from Pearson (1947) see page 77 table 4.3
+
+sigma=c(2,1,.5,.25)
+par(mfrow=c(2,2))
+for (i in 1:4)
+{
+mycontour(howardprior, c(plo,phi,plo,phi),
+	c(1+3, 1+15, 1+7, 1+5, sigma[i]),
+	main=paste("sigma=", as.character(sigma[i])),
+	xlab="p1", ylab="p2")
+	lines(c(0,1),c(0,1))
+}
+
+#How to test hypothesis?
+#Suppose hypothesis is Hi:p1>p2
+#We simulate sample from the posterior and 
+#find the proportion of simulated pairs where p1>p2
+#we do this with sigma=2
+
+s=simcontour(howardprior, c(plo, phi, plo, phi),
+	c(1+3,1+15,1+7,1+5,2), 1000)
+sum(s$>s$y)/1000
+
+
+
+

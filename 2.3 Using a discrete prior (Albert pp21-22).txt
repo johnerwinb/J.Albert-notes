@@ -1,0 +1,29 @@
+library(LearnBayes)
+p = seq(0.05, 0.95, by = .1)
+p
+
+prior=c(1,5.2,8,7.2,4.6,2.1,0.7,0.1,0,0)
+
+prior=prior/sum(prior)
+
+plot(p,prior,type="h",ylab="Prior Probability")
+
+
+data=c(11,16)
+
+#pdisc is a command in LearnBayes package
+#output of pdisc is a vector of posterior probabilities
+
+post=pdisc(p, prior, data)
+
+#cbind command is used to display a table of prior and posterior probabilities
+#table created by cbind is rounded to TWO (2) decimal places
+round(cbind(p, prior, post),2)
+
+library(lattice)
+PRIOR=data.frame("prior",p,prior)
+POST=data.frame("posterior",p,post)
+names(PRIOR)=c("Type","p","Probability")
+names(POST)=c("Type","p","Probability")
+data=rbind(PRIOR,POST)
+xyplot(Probability~p|Type,data=data,layout=c(1,2), type="h",lwd=3,col="black")

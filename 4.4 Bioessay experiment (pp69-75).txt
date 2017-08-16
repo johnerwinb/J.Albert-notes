@@ -1,0 +1,60 @@
+library(LearnBayes)
+x=c(-.86, -.3, -.05, .73)
+n=c(0, 1, 3, 5)
+y=c(0, 1, 3, 5)
+data=cbind(x, n, y)
+
+#We first try the usual method by maximization
+#We do this via function glm
+
+response = cbind(y, n - y)
+results = glm(response ~ x,  family = binomial)
+summary(results)
+
+#we use a beta prior at dose level x(l) =-0.7, the probability of death P(l)
+#the median is 0.2
+# and the 90th percentile is 0.5
+
+a1.b1=beta.select(list(p=.5, x=.2), list(p=.9, x=.5))
+
+#we see that this beta distribution is matched with a beta(1.12, 3.56)
+#If dose level is x(h)=0.6, the prior median = .8 and 90th percentile =.98.
+#of the probability of death p(h)
+
+a2.b2=beta.select(list(p=.5, x=.8), list(p=.9, x=.98))
+
+#suppose the belief about probability p(l) and p(h) are independent of the 
+#beliefs about p(h) - see joint prior of (p(l), p(h)) in p.71
+
+#joint prior (p(l), p(h)) is transformed to the regression vector (beta(o), 
+#beta(1)) - see math in p. 71
+
+#posterior density is in p. 71
+
+prior=rbind(c(-0.7, 4.68, 1.12), c(0.6, 2.84, 2.10))
+data.new=rbind(data, prior)
+
+#plot prior
+
+plot(c(-1,1), c(0,1), type="n", xlab="Dose", ylab="Prob(death)")
+lines(-0.7*c(1,1), qbeta(c(.25, .75), a1.b1[1], a1.b1[2]), lwd=4)
+lines(0.6*c(1,1), qbeta(c(.25, .75), a2.b2[1], a2.b2[2]), lwd=4)
+points(c(-0.7, 0.6), qbeta(.5, c(a1.b1[1], a2.b2[1]), c(a1.b1[2], a2.b2[2])), pch=19, cex=2)
+text(-0.3, .2, "Beta(1.12, 3.56)")
+text(.2, .8, "Beta(2.10, 0.74)")
+response=rbind(a1.b1, a2.b2)
+x=c(-0.7, 0.6)
+fit = glm(response~x, family = binomial)
+curve(exp(fit$coef[1]+fit$coef[2]*x)/(1+exp(fit$coef[1]+fit$coef[2]*x)), add=T)
+
+#define the rectangle using the glm (max likelihood) fit
+
+mycontour(logisticpost,c(-8,8,-3, 15),data.new,
+  xlab="beta0", ylab="beta1")
+
+s=simcontour(logisticpost, c(-2, 3, -1, 11), data.new, 1000)
+points(s)
+
+ plot(density(s$y), xlab="beta1")
+ theta=-s$x/s$y
+ hist(theta, xlab="LD-50", breaks=20)

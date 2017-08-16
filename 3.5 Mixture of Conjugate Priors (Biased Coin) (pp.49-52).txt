@@ -1,0 +1,39 @@
+#Mixture of Conjugate Priors
+#(Albert pp. 49-52)
+#here we have 2 beta priors each for p(head)=.3 or .7
+
+library(LearnBayes)
+
+#c(,)create vector of mixing probs and shape parameters
+#note that mean of beta=a/a+b
+#so if p=.3 then a=6 and b=14
+
+probs=c(.5,.5)
+beta.par1=c(6,14)
+beta.par2=c(14,6)
+
+#rbinds creates a matrix
+betapar=rbind(beta.par1, beta.par2)
+
+#suppose n=10, heads=7, tails=3
+
+data=c(7, 3)
+
+#R function binomial.beta.mix computes the posterior distribution
+#when the proportion p has a mixture of betas prior distribution
+
+post=binomial.beta.mix(probs, betapar, data)
+post
+
+#from the output g(p|data)=.093beta(13,17) + .907beta(21,9)
+
+#initially bias of coin is 50-50 that p(head)=.3 or .7
+#since more heads were observed, there is evidence that bias is towards heads
+#thus, the posterior density places greater weight on the second component
+
+#prior nd posterior densities
+
+curve(post$probs[1]*dbeta(x, 13, 17)+post$probs[2]*dbeta(x, 21, 9), 
+from=0, to=1, lwd=3, xlab="P", ylab="DENSITY")
+curve(.5*dbeta(x, 6, 12)+.5*dbeta(x, 12, 6), 0, 1, add=TRUE)
+legend("topleft", legend=c("Prior", "Posterior"), lwd=c(1,3))

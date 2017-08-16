@@ -1,0 +1,34 @@
+#5.3 Setting up a Bayesian problem in R
+
+#1. It is not necessary to include any normalizing constants that 
+#don't involve the paremeters.
+
+#2. REPARAMETERIZE all paremeters so they are ALL real-valued
+#A positive parameter such as variance SHOULD be transformed using log function
+#A proportion papameter can be transformed to the real line by the logit function.
+
+#the GOAL is to express the porterior density using tansformed papameters
+#to summarize THIS posterior density, write an R function defining
+# the logarithm of the joint posterior density.
+
+library('LearnBayes')
+
+#here theta is asumed to be a vector with k components
+#note the 'exp' in sigma=exp(theta[2])
+#(so theta was transformed to log first but exp is used to convert it back?)
+
+#the use of log=TRUE option in dnorm computes the logarithm of the density
+
+mylogposterior=function(theta,data)
+{
+n=length(data)
+mu=theta[1]; sigma=exp(theta[2])
+logf = function(y, mu, sigma)
+	dnorm(y, mean=mu, sd=sigma, log=TRUE)
+val=dnorm(mu, mean=10, sd=20, log=TRUE)+sum(logf(data,mu,sigma))
+return(val)
+}
+x=c(3,4,1,5,6,4,5,6,7,8,9,2,2,3,1,4,5)
+theta=c(13, 23)
+
+mylogposterior(theta,x)

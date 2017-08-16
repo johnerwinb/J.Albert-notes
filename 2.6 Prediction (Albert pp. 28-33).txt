@@ -1,0 +1,82 @@
+library(LearnBayes)
+library(lattice)
+
+s=11
+f=16
+
+p=seq(0.05, 0.95, by=.1)
+prior = c(1,5.2,8,7.2,4.6,2.1,0.7,0.1,0,0)
+prior=prior/sum(prior)
+
+#m=sample size
+#ys=successes of interest (0-20)
+
+m=20; ys=0:20
+
+#fcn "pdisc" in LearnBayes is used to compute the 
+#predictive probabilities when p is dicrete
+
+
+pred=pdiscp(p,prior,m,ys)
+round(cbind(0:20,pred),3)
+
+#From the output the most likely number of successes 
+#in this future sample are y(bar)=5 and y(bar)=6
+
+
+#suppose p is beta(a,b)
+
+ab=c(3.26,7.19)
+m=20; ys=0:20
+
+#predictive probability using beta density are computed isung "pbetap"
+
+pred=pbetap(ab,m,ys)
+
+#One convenient way of computing a predictive density for 
+#ANY prior is by simulation
+#We simulate this approch using beta(3.26, 7.19)
+
+#we draw 1000 samples from this prior and store the simulated values in p
+
+p=rbeta(1000, 3.26, 7.19)
+
+#we simulate values of y(bar) for these random ps using "rbinom"
+#y(bar) is "average number of successes"
+
+y=rbinom(1000, 20, p)
+
+#summarize the simulated draws of y(bar).
+#use "table" to tabulate distinct values.
+
+table(y)
+
+#save the frequencies of y(bar) in a vector freq
+
+freq=table(y)
+
+#convert the frequencies to probabilities
+
+ys=as.integer(names(freq))
+predprob=freq/sum(freq)
+
+#use "plot" to graph the predictive desitribution
+
+plot(ys, predprob, type="h",xlab="y", ylab="Predictive Probability")
+
+#dist is a matrix with columns ys and predprob
+
+dist=cbind(ys, predprob)
+dist
+
+#"discint" is used to summarize discrete predictive distibution 
+# by an interval that covers at least 90% of the probability.
+
+#"discint has two inputs: the matrix disc and a given coverage probability "covprob"
+
+covprob=.9
+discint(dist, covprob)
+
+#results show that the probability y(bar) falls in the 
+#interval {1,2,3,4,5,6,7,8,9,10,11} (set in results) is 91.8% (prob in results)
+

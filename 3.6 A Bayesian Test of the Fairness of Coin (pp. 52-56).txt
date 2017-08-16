@@ -1,0 +1,89 @@
+#A Bayesian Test of the Fairness of Coin
+#(Albert pp. 52-56)
+
+library(LearnBayes)
+
+#probability of 5 or fewer heads in n=20 and prob of heads=.5 (fair)
+#non-bayesian, p-value approach
+#we are testing if coin is FAIR
+
+pbinom(5, 20, 0.5)
+
+#p-value is 2*min{P(Y<=y), P(Y>=y)}
+#or p-value =2*pbinom()
+
+#the bayesian approach follows (see p. 53 for the math)
+
+#assume beta(10, 10) prioir for p when the coin is not fair
+#we observe y=5 heads in n=20 tosses
+#posterior probability is in lambda
+
+n=20
+y=5
+a=10
+p=.5
+m1=dbinom(y, n, p)* dbeta(p, a, a)/dbeta(p, a+y, a+n-y)
+lambda=dbinom(y, n, p)/(dbinom(y, n, p) + m1)
+lambda 
+
+#here posterior probability of the hypothesis of fairness is .28
+#NOT .042, leading to reversal of statistical decision!
+
+#Sensitivity of this posterior calculation to the (arbitrary) 
+#choice of parameter a=10
+
+prob.fair=function(log.a)
+{
+a=exp(log.a)
+m2=dbinom(y, n, p)* dbeta(p, a, a)/dbeta(p, a+y, a+n-y)
+dbinom(y, n, p)/(dbinom(y, n, p) + m2)
+}
+
+#Using the curve function, we graph the posterior probability for values of log a
+
+n=20; y=5; p=.5
+curve(prob.fair(x), from=-4, to=5, xlab="log a",
+ylab="Prob(coin is fair)", lwd=2)
+
+#We see from this graph that the probability of fairness appears to be greater
+#than .2 for all choices of a.
+
+#Note that Bayesian calculation was 
+#based solely on the likelihood based on the event "exactly 5 heads" 
+#NOT 5 heads or fewer as the p-value approach did
+
+#Bayesian computation for 5 heads or fewer (under binomial model p=.5)
+#see pp.54-55 for the math - cummulative probability
+
+n=20
+y=5
+a=10
+p=.5
+m2=0
+
+for (k in 0:y)
+
+#code of P(sub1)(Y,=5)  -> the predictive probability of (this event) under
+#the alternative model with beta(10, 10)
+
+m2=m2+dbinom(k, n, p)*dbeta(p, a, a)/dbeta(p, a+k, a+n-k)
+
+#see m1 in p.54 (predictive density)
+
+#pbinom computes cummulative probability (here of 5 heads under the binomial mdel p=.5)
+
+lambda=pbinom(y, n, p)/(pbinom(y, n, p)+m2)
+lambda
+
+
+
+
+
+
+
+
+
+
+
+
+

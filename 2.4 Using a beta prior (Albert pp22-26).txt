@@ -1,0 +1,62 @@
+library(LearnBayes)
+library(lattice)
+
+#obtain a and b "indirectly" through statements about the percentiles of the distribution
+#HERE the prior belief is that the median an the 90th percentiles of the proportion are given, 
+#respectively, by .3 and .5.
+
+quantile2=list(p=.9,x=.5)
+quantile1=list(p=.5,x=.3)
+
+#we use the function beta.select in LearnBayes for finding the shape parameters
+#of the beta density THAT MATCH this prior belief.
+
+beta.select(quantile1,quantile2)
+
+#we see that this prior info is match with a beta density a=3.26 and b=7.19
+
+a=3.26
+b=7.19
+s=11
+f=16
+
+#review that Beta is a conjugate to bernoulli/binomial distribution
+
+curve(dbeta(x,a+s,b+f),from=0,to=1, xlab="p",ylab="Density",lty=1,lwd=4)
+curve(dbeta(x,s+1,f+1),add=TRUE,lty=2,lwd=4)
+curve(dbeta(x,a,b),add=TRUE,lty=3,lwd=4)
+legend(.7,4,c("Prior","Likelihood","Posterior"),lty=c(3,2,1),lwd=c(3,3,3))
+
+##INFERENCES
+
+#We use pbeta and qbeta to compute probabilities and interval estimates for p
+#What is the probability that p>=.5?
+#Or P(p>=.5|data)?
+#EXACT Method
+
+1-pbeta(0.5,a+s,b+f)
+
+#this probability is small --- unlikely
+#Construct the 90% interval by computing 5th and 95th percentiles
+
+qbeta(c(0.05,0.95), a+s,b+f)
+
+#SIMULATION Method
+
+#we simulate 1000 random proportion values from beta(a+s,b+f) posterior
+
+ps=rbeta(1000,a+s,b+f)
+
+#display the histogram of simulated values
+
+hist(ps,xlab="p",main="")
+
+#the probability that the proportion is larger that .5 is estimated
+#using the proportion of simulated values in this range
+
+sum(ps>=0.5)/1000
+
+Use the simulated values to get 90% interval
+
+quantile(ps,c(0.05,0.95))
+

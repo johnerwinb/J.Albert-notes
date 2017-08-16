@@ -1,0 +1,80 @@
+##Basic statistics on "studentdata"
+
+##we use studentdata in LearnBayes
+
+library("LearnBayes")
+#access the data by:
+
+data(studentdata)
+
+#to see variable names
+
+studentdata[1, ]
+
+#to see the top 5 observations:
+
+head(studentdata)
+
+#to see the bottom 5 observations:
+
+tail(studentdata)
+
+#attach (make visible) the data to the R environment
+
+attach(studentdata)
+
+#without attach, you need to use studentdata$"variable name" for all requests
+
+#to tally responses in categorical variable Drink
+
+table(Drink)
+
+#without using attach, you need to use table(studentdata$Drink)
+
+#construct bar plot
+
+barplot(table(Drink), xlab = "Drink", ylab="Count")
+
+#compute new variable
+
+hours.of.sleep=WakeUp-ToSleep
+
+#descriptive statistics
+
+summary(hours.of.sleep)
+
+#construct histogram
+
+hist(hours.of.sleep,main="")
+
+#compare with
+
+hist(hours.of.sleep)	#see change in heading
+
+#get boxplot of hours.of.sleep per gender
+
+boxplot(hours.of.sleep~Gender, ylab="Hours of Sleep")
+
+#create variable per category
+
+female.Haircut=Haircut[Gender=="female"]
+
+male.Haircut=Haircut[Gender=="male"]
+
+#get summary of these new variables
+
+summary(female.Haircut)
+summary(male.Haircut)
+
+boxplot(Haircut~Gender,ylab="Haircut")
+
+#R commands for studying relationships
+
+plot(jitter(ToSleep),jitter(hours.of.sleep))
+#Try removing jitter
+
+plot((ToSleep),(hours.of.sleep))
+
+fit=(lm(hours.of.sleep~ToSleep
+fit
+abline(fit)
