@@ -54,3 +54,5 @@ mycontour(betabinexch, c(-8,-4.5,3,16.5), cancermortality,
 #the strong skewness has been reduced and the distribution 
 #is more amenable to the computational methods to be described 
 #in the following chapters.
+
+(testing changes)
